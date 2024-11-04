@@ -8,7 +8,7 @@
 import UIKit
 import CoreLocation
 
-class ViewController: UIViewController, CLLocationManagerDelegate {
+class ViewController: UIViewController, CLLocationManagerDelegate, UITextFieldDelegate {
 
     @IBOutlet weak var locationText: UITextField!
     
@@ -18,21 +18,43 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     @IBOutlet weak var location: UILabel!
     @IBOutlet weak var toggle: UISwitch!
     
+    @IBOutlet weak var CtoF: UILabel!
     var isCelsius = true
     let locationManager = CLLocationManager()
 
     override func viewDidLoad() {
         
         super.viewDidLoad()
+        let config = UIImage.SymbolConfiguration(paletteColors: [
+            UIColor.red, UIColor.yellow
+        ])
+        weatherImage.preferredSymbolConfiguration = config
+        weatherImage.image = UIImage(systemName: "cursorarrow.rays")
+        locationText.delegate = self
         weatherCondition.isHidden = true
         temperature.isHidden = true
         location.isHidden = true
         toggle.isHidden = true
+        CtoF.isHidden = true
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
         
-        
     }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.endEditing(true)
+        
+        weatherCondition.isHidden = false
+        temperature.isHidden = false
+        location.isHidden = false
+        toggle.isHidden = false
+        CtoF.isHidden = false
+        if let location = textField.text, !location.isEmpty {
+            
+            fetchWeather(for: location)
+                }
+        return true
+    }
+    
     
 
     
@@ -41,6 +63,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         temperature.isHidden = false
         location.isHidden = false
         toggle.isHidden = false
+        CtoF.isHidden = false
         locationManager.requestLocation()
     }
     
@@ -58,6 +81,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         weatherCondition.isHidden = false
         temperature.isHidden = false
         location.isHidden = false
+        CtoF.isHidden = false
         toggle.isHidden = false
         if let location = locationText.text {
                     fetchWeather(for: location)
@@ -139,7 +163,6 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
             default:
                 weatherImage.image = UIImage(systemName: "cloud.fill")
             }
-        weatherImage.tintColor = UIColor.systemBlue
         }
     
     @objc func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
